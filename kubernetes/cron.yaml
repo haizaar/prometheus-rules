@@ -7,16 +7,16 @@ groups:
         label_replace(
           max(
             kube_job_status_start_time
-            * ON(exported_job) GROUP_RIGHT()
+            * ON(job_name) GROUP_RIGHT()
             kube_job_labels{label_cronjob!=""}
-          ) BY (exported_job, label_cronjob)
+          ) BY (job_name, label_cronjob)
           == ON(label_cronjob) GROUP_LEFT()
           max(
             kube_job_status_start_time
-            * ON(exported_job) GROUP_RIGHT()
+            * ON(job_name) GROUP_RIGHT()
             kube_job_labels{label_cronjob!=""}
           ) BY (label_cronjob),
-          "job", "$1", "exported_job", "(.+)"),
+          "job", "$1", "job_name", "(.+)"),
         "cronjob", "$1", "label_cronjob", "(.+)")
 
   - record: job_cronjob:kube_job_status_failed:sum
@@ -28,7 +28,7 @@ groups:
       label_replace(
         label_replace(
           (kube_job_status_failed != 0),
-          "job", "$1", "exported_job", "(.+)"),
+          "job", "$1", "job_name", "(.+)"),
         "cronjob", "$1", "label_cronjob", "(.+)")
 
 
